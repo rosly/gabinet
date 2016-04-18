@@ -1,30 +1,72 @@
+#include <qtableview.h>
+#include <qtablewidget.h>
+#include <qsqltablemodel.h>
+#include <qsqlrelationaltablemodel.h>
+#include <qsqlrelationaldelegate.h>
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
 #include "dbmanager.h"
-#include <qsqltablemodel.h>
-#include <qtableview.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
+    // TODO remove this later since we dont use the generated UI
+    //ui->setupUi(this);
+
+    //main tab widget at stretched to main window
+    QTabWidget *mainTab = new QTabWidget;
 
     DbManager db("gabinet.sql3");
-    db.listPacjents();
 
-    QSqlTableModel *model = new QSqlTableModel(this, db.db);
-    model->setTable("pacjent");
-    model->setEditStrategy(QSqlTableModel::OnManualSubmit);
-    model->select();
-    //model->setHeaderData(1, Qt::Horizontal, tr("nazwisko"));
-    //model->setHeaderData(2, Qt::Horizontal, tr("imie"));
+    //set up the patients view
+    QSqlTableModel *patientModel = new QSqlTableModel(this, db.db);
+    patientModel->setTable("pacjent");
+    patientModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    patientModel->select();
+    //patientModel->setHeaderData(1, Qt::Horizontal, tr("nazwisko"));
+    //patientModel->setHeaderData(2, Qt::Horizontal, tr("imie"));
 
-    QTableView *view = new QTableView;
-    view->setModel(model);
-    view->hideColumn(0); // don't show the ID
-    view->show();
+    QTableView *patientView = new QTableView;
+    patientView->setModel(patientModel);
+    patientView->hideColumn(0); // don't show the ID
+    patientView->show();
+
+    mainTab->addTab(patientView, "Pacjenci");
+
+    //set up the services view
+    QSqlTableModel *servicesModel = new QSqlTableModel(this, db.db);
+    servicesModel->setTable("usluga");
+    servicesModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    servicesModel->select();
+
+    QTableView *servicesView = new QTableView;
+    servicesView->setModel(servicesModel);
+    servicesView->hideColumn(0); // don't show the ID
+    servicesView->show();
+
+    mainTab->addTab(servicesView, "Usługi");
+
+    //set up the treatments view
+    QSqlRelationalTableModel *treatmentModel = new QSqlRelationalTableModel(this, db.db);
+    treatmentModel->setTable("zabieg");
+    treatmentModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    treatmentModel->setRelation(treatmentModel->fieldIndex("pacjent"), QSqlRelation("pacjent", "id", "nazwisko"));
+    treatmentModel->setRelation(treatmentModel->fieldIndex("usluga"), QSqlRelation("usluga", "id", "nazwa"));
+
+    treatmentModel->select();
+
+    QTableView *treatmentView = new QTableView;
+    treatmentView->setModel(treatmentModel);
+    treatmentView->hideColumn(0); // don't show the ID
+    treatmentView->setItemDelegate(new QSqlRelationalDelegate(treatmentView));
+    treatmentView->show();
+
+    mainTab->addTab(treatmentView, "Zabiegi");
+
+    //finaly use tabWidged as central widget
+    setCentralWidget(mainTab);
 }
 
 MainWindow::~MainWindow()

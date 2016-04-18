@@ -16,6 +16,7 @@ DbManager::DbManager(const QString &path)
     }
 }
 
+#if 0
 void DbManager::listPacjents(void)
 {
     QSqlQuery query("SELECT * FROM pacjent");
@@ -25,3 +26,4 @@ void DbManager::listPacjents(void)
        qDebug() << name;
     }
 }
+#endif

@@ -16,6 +16,19 @@ DbManager::DbManager(const QString &path)
     }
 }
 
+QSqlDatabase& DbManager::reopen(const QString &path)
+{
+    db.close();
+    db.setDatabaseName(path);
+    if (!db.open()) {
+      qDebug() << "Error: connection with database fail";
+    } else {
+      qDebug() << "Database: connection ok";
+    }
+
+    return db;
+}
+
 #if 0
 void DbManager::listPacjents(void)
 {

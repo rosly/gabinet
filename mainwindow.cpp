@@ -65,6 +65,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     mainTab->addTab(treatmentView, "Zabiegi");
 
+    //QVBoxLayout
+
     //finaly use tabWidged as central widget
     setCentralWidget(mainTab);
 }

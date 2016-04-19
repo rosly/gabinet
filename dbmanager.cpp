@@ -4,19 +4,12 @@
 #include <qsqlrecord.h>
 #include <qdebug.h>
 
-DbManager::DbManager(const QString &path)
+DbManager::DbManager(void)
 {
     db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName(path);
-
-    if (!db.open()) {
-      qDebug() << "Error: connection with database fail";
-    } else {
-      qDebug() << "Database: connection ok";
-    }
 }
 
-QSqlDatabase& DbManager::reopen(const QString &path)
+QSqlDatabase& DbManager::open(const QString &path)
 {
     db.close();
     db.setDatabaseName(path);

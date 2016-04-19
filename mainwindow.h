@@ -2,10 +2,13 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <qpushbutton.h>
 
-namespace Ui {
-class MainWindow;
-}
+#include "dbmanager.h"
+
+///namespace Ui {
+//class MainWindow;
+//}
 
 class MainWindow : public QMainWindow
 {
@@ -16,7 +19,11 @@ public:
     ~MainWindow();
 
 private:
-    Ui::MainWindow *ui;
+    //Ui::MainWindow *ui;
+    QPushButton *reloadDbButton;
+    DbManager db;
+private slots:
+    void handleReloadDB();
 };
 
 #endif // MAINWINDOW_H

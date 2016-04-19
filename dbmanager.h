@@ -8,8 +8,8 @@ class DbManager
 {
 public:
     QSqlDatabase db;
-    DbManager(const QString& path);
-    QSqlDatabase& reopen(const QString &path);
+    DbManager(void);
+    QSqlDatabase& open(const QString &path);
 };
 
 #endif // DBMANAGER_H

@@ -3,22 +3,20 @@
 #include <qsqltablemodel.h>
 #include <qsqlrelationaltablemodel.h>
 #include <qsqlrelationaldelegate.h>
+#include <qfiledialog.h>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "dbmanager.h"
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
+//: ui(new Ui::MainWindow)
 {
     // TODO remove this later since we dont use the generated UI
     //ui->setupUi(this);
 
     //main tab widget at stretched to main window
     QTabWidget *mainTab = new QTabWidget;
-
-    DbManager db("gabinet.sql3");
 
     //set up the patients view
     QSqlTableModel *patientModel = new QSqlTableModel(this, db.db);
@@ -65,13 +63,27 @@ MainWindow::MainWindow(QWidget *parent) :
 
     mainTab->addTab(treatmentView, "Zabiegi");
 
-    //QVBoxLayout
+    //add load database button
+    reloadDbButton = new QPushButton("Load DB");
+    connect(reloadDbButton, SIGNAL (released()), this, SLOT (handleReloadDB()));
 
-    //finaly use tabWidged as central widget
-    setCentralWidget(mainTab);
+    //finaly use widget hierarchy
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->addWidget(mainTab);
+    mainLayout->addWidget(reloadDbButton);
+    QWidget *subWindow = new QWidget();
+    subWindow->setLayout(mainLayout);
+    setCentralWidget(subWindow);
+}
+
+void MainWindow::handleReloadDB()
+{
+    QString fileName = QFileDialog::getOpenFileName(this,
+        tr("Open database"), "/", tr("sqlite3 files (*.sql3)"));
+    db.open(fileName);
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+    //delete ui;
 }
